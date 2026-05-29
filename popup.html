@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 320px; padding: 16px; font-family: sans-serif; font-size: 14px; background: #f9f9f9; }
+    h3 { margin: 0 0 16px; font-size: 16px; color: #333; border-bottom: 2px solid #2196F3; padding-bottom: 8px; }
+    label { display: block; margin-bottom: 4px; color: #555; font-size: 12px; }
+    input[type="text"] { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; background: white; font-size: 14px; }
+    input[type="text"]:focus { outline: none; border-color: #2196F3; }
+    .btn-save { width: 100%; padding: 10px; margin-bottom: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; background-color: #4CAF50; color: white; font-weight: bold; }
+    .btn-autofill { width: 100%; padding: 10px; margin-bottom: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; background-color: #2196F3; color: white; font-weight: bold; }
+    .btn-save:hover { background-color: #45a049; }
+    .btn-autofill:hover { background-color: #1976D2; }
+    .status { text-align: center; font-size: 12px; min-height: 20px; margin: 4px 0; }
+    .section { background: white; border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid #eee; }
+    .section-title { font-size: 11px; font-weight: bold; color: #2196F3; margin-bottom: 8px; text-transform: uppercase; }
+
+    /* ===== 自作プルダウン（ネイティブselectがpopupで開かない対策）===== */
+    .cdd { position: relative; margin-bottom: 12px; }
+    .cdd-btn { width: 100%; padding: 8px; text-align: left; border: 1px solid #ddd; border-radius: 4px; background: white; font-size: 14px; cursor: pointer; box-sizing: border-box; color: #333; }
+    .cdd-btn::after { content: '▾'; float: right; color: #999; }
+    .cdd.open .cdd-btn { border-color: #2196F3; }
+    .cdd-list { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 2px); max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; border-radius: 4px; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+    .cdd.open .cdd-list { display: block; }
+    .cdd-item { padding: 8px; cursor: pointer; font-size: 14px; }
+    .cdd-item:hover { background: #e3f2fd; }
+  </style>
+</head>
+<body>
+  <h3>就活マイページ自動入力</h3>
+
+  <button class="btn-autofill" id="autofillBtn">自動入力する</button>
+  <p class="status" id="status"></p>
+
+  <div class="section">
+    <div class="section-title">氏名</div>
+    <label>姓（漢字）</label>
+    <input id="lastName" type="text" placeholder="山田">
+    <label>名（漢字）</label>
+    <input id="firstName" type="text" placeholder="太郎">
+    <label>セイ（フリガナ）</label>
+    <input id="lastNameKana" type="text" placeholder="ヤマダ">
+    <label>メイ（フリガナ）</label>
+    <input id="firstNameKana" type="text" placeholder="タロウ">
+    <label>性別</label>
+    <div class="cdd" data-dd="gender"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">生年月日</div>
+    <label>年（西暦）</label>
+    <div class="cdd" data-dd="birthYear"></div>
+    <label>月</label>
+    <div class="cdd" data-dd="birthMonth"></div>
+    <label>日</label>
+    <div class="cdd" data-dd="birthDay"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">連絡先</div>
+    <label>郵便番号</label>
+    <input id="zipCode" type="text" placeholder="000-0000">
+    <label>都道府県</label>
+    <input id="prefecture" type="text" placeholder="東京都">
+    <label>市区町村</label>
+    <input id="city" type="text" placeholder="新宿区">
+    <label>町域・番地</label>
+    <input id="street" type="text" placeholder="新宿0-0-0">
+    <label>建物名・部屋番号</label>
+    <input id="building" type="text" placeholder="○○マンション101">
+    <label>住所（分割なしフォーム用 全部まとめて）</label>
+    <input id="address" type="text" placeholder="新宿区新宿0-0-0">
+    <label>自宅電話番号（任意・無ければ空欄）</label>
+    <input id="homePhone" type="text" placeholder="03-1234-5678">
+    <label>携帯電話番号</label>
+    <input id="mobile" type="text" placeholder="090-1234-5678">
+    <label>メールアドレス（メイン）</label>
+    <input id="email" type="text" placeholder="example@example.com">
+    <label>サブメールアドレス（任意・無ければ空欄）</label>
+    <input id="subEmail" type="text" placeholder="sub@example.com">
+    <label>休暇中の連絡先を現住所と同じにする</label>
+    <div class="cdd" data-dd="sameAsCurrentAddr"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">学歴</div>
+    <label>大学名</label>
+    <input id="university" type="text" placeholder="○○大学">
+    <label>学部・学科</label>
+    <input id="faculty" type="text" placeholder="経済学部経済学科">
+    <label>卒業予定 年（西暦）</label>
+    <div class="cdd" data-dd="gradYear"></div>
+    <label>卒業予定 月</label>
+    <div class="cdd" data-dd="gradMonth"></div>
+    <label>卒業区分</label>
+    <div class="cdd" data-dd="gradType"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">学校生活</div>
+    <label>ゼミ・研究室名</label>
+    <input id="zemi" type="text" placeholder="国際経済学ゼミ">
+    <label>クラブ・サークル名</label>
+    <input id="circle" type="text" placeholder="〇〇サークル">
+  </div>
+
+  <button class="btn-save" id="saveBtn">保存する</button>
+  <p class="status" id="statusSave"></p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
